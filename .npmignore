@@ -1,0 +1,9 @@
+.vscode
+node_modules
+src
+test
+.mocharc.json
+package-lock.json
+dist
+tsconfig.json
+tsconfig.lib.json

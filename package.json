@@ -1,0 +1,39 @@
+{
+  "name": "@napp/config",
+  "version": "1.0.0",
+  "description": "low level config library",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/esm/index.d.ts",
+  "scripts": {
+    "clear": "npx rimraf lib/**",
+    "tsc": "tsc -p tsconfig.json",
+    "prebuild": "npm version patch && npm run clear",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "npm run build:esm && npm run build:cjs",
+    "prepush": "npm run test && npm run build",
+    "push": "npm publish --access=public",
+    "test1": "ts-node  src/index.ts",
+    "test": "mocha"
+  },
+  "author": "farcek@gmail.com",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/napp-core/config.git"
+  },
+  "devDependencies": {
+    "@testdeck/mocha": "latest",
+    "@types/chai": "latest",
+    "@types/mocha": "latest",
+    "@types/node": "latest",
+    "mocha": "latest",
+    "source-map-support": "latest",
+    "ts-node": "latest",
+    "typescript": "latest"
+  },
+  "keywords": [
+    "config"
+  ]
+}
