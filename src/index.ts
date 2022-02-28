@@ -1,9 +1,9 @@
 import { IConfigItem, IConfigLoader } from "./common";
 import { configureItem,ConfigureBase } from "./configure";
-import { IntItem, StringItem } from "./items";
+import { IntItem, StringItem,BooleanItem,ChooseItem } from "./items";
 
 export {
     IConfigItem, IConfigLoader,
     configureItem,ConfigureBase,
-    IntItem, StringItem
+    IntItem, StringItem, BooleanItem,ChooseItem
 }
