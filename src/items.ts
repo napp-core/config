@@ -1,3 +1,4 @@
+import { readFileSync } from "fs";
 import { IConfigItem } from "./common"
 
 export class IntItem implements IConfigItem<number> {
@@ -43,5 +44,17 @@ export class BooleanItem implements IConfigItem<boolean> {
             return false;
         }
         return defaut;
+    }
+}
+
+export class FileItem implements IConfigItem<Buffer> {
+    convert(raw: string, defaut: Buffer) {
+        let filename = raw  || '';
+        try {
+            return readFileSync(filename)
+        } catch (error) {            
+            console.log(error)
+            throw new Error(`cannot read file. filename="${filename}"`)
+        }
     }
 }
