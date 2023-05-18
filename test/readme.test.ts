@@ -31,7 +31,7 @@ export class DBConfig extends ConfigureBase {
         .valueOf();
 }
 
-class envLoader implements IConfigLoader {
+class EnvLoader implements IConfigLoader {
     get(key: string): string {
         return process.env[key] || ''
     }
@@ -40,32 +40,16 @@ class envLoader implements IConfigLoader {
     }
 }
 
-class fileLoader implements IConfigLoader {
+// test process fill
+process.env['PORT'] = '4000'
+process.env['DATABASE'] = 'testdb'
+process.env['USERNAME'] = 'dbuser'
 
-    store: Record<string, string>;
-    constructor() {
-        // load here file data load
-        this.store = {
-            // ... sample data,
-            PORT: '4000',
-            DATABASE: 'testdb', USERNAME: "dbuser"
-        }
-    }
 
-    get(key: string): string {
-        return this.store[key] || ''
-    }
-    has(key: string): boolean {
-        return key in this.store
-    }
-}
+const loader = new EnvLoader();
 
-// export const config = new Config(new envLoader())
-export const config = new Config(new fileLoader())
-
-// export const db = new DBConfig(new envLoader())
-export const db = new DBConfig(new fileLoader())
-
+export const config = new Config(loader)
+export const db = new DBConfig(loader)
 
 @suite
 class ReadmeTest {

@@ -6,31 +6,36 @@ low lavel configure library.
 
 ``` typescript
 
-import { ConfigureBase, configureItem, IConfigLoader, IntItem, StringItem } from "../src";
-
-
+import { ConfigureBase, IConfigLoader } from "../src";
+import { ConfigPortItem } from "../src/item.port";
+import { ConfigStringItem } from "../src/item.string";
 
 // config.ts
 export class Config extends ConfigureBase {
+    PORT = new ConfigPortItem(this, 'PORT')
+        .default(3000)
+        .valueOf();
 
-    @configureItem(new IntItem())
-    PORT = 3000;
-
-    @configureItem(new StringItem())
-    HOST = 'localhost';
+    HOST = new ConfigStringItem(this, 'HOST')
+        .default('localhost')
+        .valueOf();
 }
 
 
 export class DBConfig extends ConfigureBase {
 
-    @configureItem(new StringItem(), { requared: true })
-    DATABASE = '';
+    DATABASE = new ConfigStringItem(this, 'DATABASE')
+        .requared()
+        .valueOf();
 
-    @configureItem(new StringItem())
-    USERNAME = 'root';
+
+
+    USERNAME = new ConfigStringItem(this, 'USERNAME')
+        .default('root')
+        .valueOf();
 }
 
-class envLoader implements IConfigLoader {
+class EnvLoader implements IConfigLoader {
     get(key: string): string {
         return process.env[key] || ''
     }
@@ -39,38 +44,22 @@ class envLoader implements IConfigLoader {
     }
 }
 
-class fileLoader implements IConfigLoader {
+// --- test process fill --- //
+// process.env['PORT'] = '4000'
+// process.env['DATABASE'] = 'testdb'
+// process.env['USERNAME'] = 'dbuser'
 
-    store: Record<string, string>;
-    constructor() {
-        // load here file data load
-        this.store = {
-            // ... sample data,
-            PORT: '4000',
-            DATABASE: 'testdb', USERNAME: "dbuser"
-        }
-    }
 
-    get(key: string): string {
-        return this.store[key] || ''
-    }
-    has(key: string): boolean {
-        return key in this.store
-    }
-}
+const loader = new EnvLoader();
 
-// export const config = new Config(new envLoader())
-export const config = new Config(new fileLoader())
-
-// export const db = new DBConfig(new envLoader())
-export const db = new DBConfig(new fileLoader())
-
+export const config = new Config(loader)
+export const db = new DBConfig(loader)
 
 @suite
 class ReadmeTest {
     @test
     config() {
-        assert.deepEqual('localhost', config.HOST,'default value')
+        assert.deepEqual('localhost', config.HOST, 'default value')
         assert.deepEqual(4000, config.PORT, 'file store PORT value')
         assert.deepEqual('testdb', db.DATABASE, 'file store DATABASE value')
         assert.deepEqual('dbuser', db.USERNAME, 'file store USERNAME value')
