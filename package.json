@@ -31,6 +31,7 @@
     "mocha": "latest",
     "source-map-support": "latest",
     "ts-node": "latest",
+    "rimraf": "latest",
     "typescript": "latest"
   },
   "keywords": [
