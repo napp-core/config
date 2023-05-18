@@ -1,27 +1,34 @@
 import { suite, test, } from "@testdeck/mocha";
 import assert from "assert";
-import { ConfigureBase, configureItem, IConfigLoader, IntItem, StringItem } from "../src";
+import { ConfigureBase, IConfigLoader } from "../src";
+import { ConfigPortItem } from "../src/item.port";
+import { ConfigStringItem } from "../src/item.string";
 
 
 
 // config.ts
 export class Config extends ConfigureBase {
+    PORT = new ConfigPortItem(this, 'PORT')
+        .default(3000)
+        .valueOf();
 
-    @configureItem(new IntItem())
-    PORT = 3000;
-
-    @configureItem(new StringItem())
-    HOST = 'localhost';
+    HOST = new ConfigStringItem(this, 'HOST')
+        .default('localhost')
+        .valueOf();
 }
 
 
 export class DBConfig extends ConfigureBase {
 
-    @configureItem(new StringItem(), { requared: true })
-    DATABASE = '';
+    DATABASE = new ConfigStringItem(this, 'DATABASE')
+        .requared()
+        .valueOf();
 
-    @configureItem(new StringItem())
-    USERNAME = 'root';
+
+
+    USERNAME = new ConfigStringItem(this, 'USERNAME')
+        .default('root')
+        .valueOf();
 }
 
 class envLoader implements IConfigLoader {
@@ -64,7 +71,7 @@ export const db = new DBConfig(new fileLoader())
 class ReadmeTest {
     @test
     config() {
-        assert.deepEqual('localhost', config.HOST,'default value')
+        assert.deepEqual('localhost', config.HOST, 'default value')
         assert.deepEqual(4000, config.PORT, 'file store PORT value')
         assert.deepEqual('testdb', db.DATABASE, 'file store DATABASE value')
         assert.deepEqual('dbuser', db.USERNAME, 'file store USERNAME value')

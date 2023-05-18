@@ -1,23 +1,29 @@
 import { suite, test, } from "@testdeck/mocha";
 import assert from 'assert';
-import { ConfigureBase, configureItem, IntItem, StringItem } from "../src";
+import { ConfigureBase } from "../src";
 import { Loader } from "./loader";
+import { ConfigPortItem } from "../src/item.port";
+import { ConfigStringItem } from "../src/item.string";
 
 
 export class Config1 extends ConfigureBase {
 
-    @configureItem(new IntItem())
-    port = 3000;
+    port = new ConfigPortItem(this, 'port')
+        .default(3000)
+        .valueOf();
 
-    @configureItem(new StringItem())
-    host = 'localhost';
+
+    host = new ConfigStringItem(this, 'host')
+        .default('localhost')
+        .valueOf();
 }
 
 
 export class Config2 extends ConfigureBase {
 
-    @configureItem(new StringItem(), { requared: true })
-    host: string='';
+    host = new ConfigStringItem(this, 'host')
+        .requared()
+        .valueOf();
 }
 
 
@@ -68,13 +74,13 @@ class BasicTest {
 
             }))
 
-            ''+conf.host
+            '' + conf.host
 
-            
+
         } catch (error) {
 
             assert.deepEqual(
-                `Config property missing. propertyName="host"`,
+                `requared config value: host`,
                 (error as any || {}).message
             )
 

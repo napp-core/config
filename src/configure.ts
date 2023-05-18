@@ -1,57 +1,78 @@
-import { IConfigItem, IConfigLoader } from "./common";
+export interface IConfigLoader {
+    get(key: string): string;
+    has(key:string):boolean;
+}
 
 
-const _key = Symbol.for('__my-napp-config')
-const _val = Symbol.for('__my-napp-config-val')
+const _loader = Symbol.for('__my-napp-loader')
 export class ConfigureBase {
+    private [_loader] = {} as IConfigLoader;
+    constructor(loader: IConfigLoader) {
+        this[_loader] = loader;
+    }
+}
 
-    private [_key] = _val;
-    constructor(public loader: IConfigLoader) {
+export class ConfigBaseItem<T> {
+    private _default: { v?: T, h: boolean } = {
+        h: false
+    };
+    private _requared = false;
 
+    constructor(private conf: ConfigureBase, private kname: string) { }
+
+    constructorAfter() { }
+
+    default(v: T) {
+        this._default = { h: true, v }
+        return this;
+    }
+    requared() {
+        this._requared = true
+        return this;
     }
 
-}
-
-export interface OConfigureItem {
-    requared?: boolean
-}
-
-export function configureItem(item: IConfigItem<any>, opt?: OConfigureItem): PropertyDecorator {
-    return function (target: object, propertyKey: string | symbol) {
-
-        if (typeof propertyKey === 'string') {
-            const $ = {
-                val: undefined as any
-            }
 
 
+    protected getLoader() {
+        return this.conf[_loader]
+    }
+    protected getRequared() {
+        return this._requared;
+    }
 
-            Object.defineProperty(target, propertyKey, {
-                get() {
-                    let me = (this as ConfigureBase);
-                    if (me && me[_key] === _val) {
-                        ;
-                    } else {
-                        throw new Error('not support napp conig')
-                    }
-                    if (typeof propertyKey === 'string') {
-                        let has = me.loader.has(propertyKey);
-                        if (has) {
-                            let v = me.loader.get(propertyKey);
-                            return item.convert(v, $.val);
-                        } else {
-                            if (opt?.requared === true) {
-                                throw new Error(`Config property missing. propertyName="${propertyKey}"`)
-                            }
-                        }
-                    }
-                    return $.val
-                },
-                set(value) { $.val = value },
-                configurable: false,
-                enumerable: false,
-            });
+    convert(raw: string): T {
+        throw new Error('requared overrite')
+    }
+
+    protected validate(has: boolean, val: T) {
+        if (this._requared && has === false) {
+            throw new Error(`requared config value: ${this.kname}`)
         }
     }
+    valueOf(): T {
+        let loader = this.getLoader();
+        let has = loader.has(this.kname);
+        if (has) {
+            let raw = loader.get(this.kname);
+            let val = this.convert(raw);
+            this.validate(true, val);
+            return val
+        }
+
+
+        if (this._default.h) {
+            let val = this._default.v as T;
+            this.validate(false, val);
+            return val
+        }
+        if (this._requared) {
+            throw new Error(`requared config value: ${this.kname}`)
+        }
+
+        return this._default.v as T
+    }
+
 }
+
+
 
