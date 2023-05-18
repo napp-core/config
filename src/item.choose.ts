@@ -1,11 +1,11 @@
 import { ConfigBaseItem } from "./configure";
 
-export class ConfigChooseItem<T> extends ConfigBaseItem<T>  {
-    override convert(raw: string): T {
-        return raw as T;
+export class ConfigChooseItem extends ConfigBaseItem<string>  {
+    override convert(raw: string): string {
+        return raw as string;
     }
 
-    protected override validate(has: boolean, val: T): void {
+    protected override validate(has: boolean, val: string): void {
 
         if (this._items) {
             for (let it of this._items) {
@@ -19,8 +19,8 @@ export class ConfigChooseItem<T> extends ConfigBaseItem<T>  {
         throw new Error('not defined allowed values. you call need "allowed" method ')
     }
 
-    private _items: Array<T> | null = null;
-    allowed(items: Array<T>) {
+    private _items: Array<string> | null = null;
+    allowed(items: Array<string>) {
         this._items = items;
     }
 
